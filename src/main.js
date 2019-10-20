@@ -13,7 +13,6 @@ let scene;
 let renderer;
 
 let cameraHandle;
-let light;
 let planet;
 let starField;
 
@@ -44,10 +43,6 @@ function main() {
   // Create stars
   starField = makeStarField(5000);
   scene.add(starField);
-
-  // Add lighting
-  light = new THREE.AmbientLight('white', 1);
-  scene.add( light );
 
   renderer = new THREE.WebGLRenderer( {antialias: true} );
   renderer.setSize( window.innerWidth, window.innerHeight );
