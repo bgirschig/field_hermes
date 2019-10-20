@@ -1,6 +1,8 @@
-export const background = '#f1653b';
-export const foreground = '#ffffff';
-export const mask = '#000000';
+import settings from '@/settings';
+
+export const background = settings.background || '#f1653b';
+export const foreground = settings.foreground || '#ffffff';
+export const mask = settings.mask || '#000000';
 
 document.body.style.setProperty('--background_color', background);
 document.body.style.setProperty('--foreground_color', foreground);

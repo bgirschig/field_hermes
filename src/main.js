@@ -41,7 +41,7 @@ function main() {
   scene.add( planet );
 
   // Create stars
-  starField = makeStarField(5000);
+  starField = makeStarField(5000, theme.foreground);
   scene.add(starField);
 
   renderer = new THREE.WebGLRenderer( {antialias: true} );

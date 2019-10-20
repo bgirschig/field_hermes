@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+
 const textureLoader = new THREE.TextureLoader();
 const textures = [
   textureLoader.load(require('@/resources/stars/1.png')),
@@ -12,10 +13,10 @@ const textures = [
 /**
  * Creates and returns a star field
  * @param {Number} count How many stars to create
- * @param {THREE.Texture} texture How many stars to create
+ * @param {THREE.Color} color
  * @return {THREE.Geometry}
  */
-export default function createStars(count) {
+export default function createStars(count, color) {
   const pointDimensions = 3;
   const countPerTexture = Math.ceil(count / textures.length);
   const group = new THREE.Group();
@@ -36,7 +37,7 @@ export default function createStars(count) {
 
     // Create material
     const material = new THREE.PointsMaterial({
-      color: 0xFFFFFF,
+      color: color || 0xFFFFFF,
       size: .8,
       map: textureItem,
       alphaTest: 0.5,
