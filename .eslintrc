@@ -1,0 +1,14 @@
+{
+  "parserOptions": {
+      "ecmaVersion": 2017,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+  },
+  "extends": "google",
+  "rules": {
+    "max-len": ["error", 100],
+    "arrow-parens": "off"
+  }
+}
