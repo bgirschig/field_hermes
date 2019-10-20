@@ -34,8 +34,8 @@ function main() {
   const geometry = new THREE.SphereGeometry( 1, 80, 80 );
   const material = bichromicMaterial({
     map: textureLoader.load(planetTexture),
-    color1: new THREE.Color(theme.foreground),
-    color2: new THREE.Color(theme.background),
+    color1: new THREE.Color(theme.background),
+    color2: new THREE.Color(theme.foreground),
   });
   planet = new THREE.Mesh( geometry, material );
   scene.add( planet );
