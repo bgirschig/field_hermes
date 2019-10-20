@@ -3,37 +3,41 @@ import '@/style/layout.css';
 import * as theme from '@/style/theme';
 import * as THREE from 'three';
 import bichromicMaterial from '@/materials/bichromicMaterial';
-import textureSrc from '@/resources/albedo_sharp_small.png';
+import planetTexture from '@/resources/albedo_sharp_small.png';
+import makeStarField from '@/stars';
 
 const textureLoader = new THREE.TextureLoader();
 
 let camera;
 let scene;
 let renderer;
-let geometry;
-let material;
-let mesh;
 let light;
+let planet;
+let starField;
 
 /** Main app method. everything starts from here */
 function main() {
-  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-  camera.position.setZ(3);
+  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 100 );
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(theme.background);
 
-  geometry = new THREE.SphereGeometry( 1, 50, 50 );
-  material = bichromicMaterial({
-    map: textureLoader.load(textureSrc),
+  // create planet
+  const geometry = new THREE.SphereGeometry( 1, 50, 50 );
+  const material = bichromicMaterial({
+    map: textureLoader.load(planetTexture),
     color1: new THREE.Color(theme.foreground),
     color2: new THREE.Color(theme.background),
   });
-  mesh = new THREE.Mesh( geometry, material );
-  mesh.position.setY(-1.1);
+  planet = new THREE.Mesh( geometry, material );
+  planet.position.setY(-1.1);
+  scene.add( planet );
 
-  scene.add( mesh );
+  // Create stars
+  starField = makeStarField(1000);
+  scene.add(starField);
 
+  // Add lighting
   light = new THREE.AmbientLight('white', 1);
   scene.add( light );
 
@@ -46,7 +50,7 @@ function main() {
 
 /** Update function, called just before the render, on each frame */
 function update() {
-  mesh.rotation.x += 0.001;
+  planet.rotation.x += 0.001;
 }
 
 /** loop, called every frame */
