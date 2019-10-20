@@ -1,8 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const env = process.env.NODE_ENV || 'development';
 
 module.exports = {
   entry: './src/main.js',
+  mode: env,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src/'),
@@ -30,7 +32,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html'
+      template: './src/index.html',
     }),
   ],
   output: {
@@ -38,8 +40,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   target: 'web',
-  devtool: 'inline-source-map',
-  mode: 'development',
+  devtool: (env === 'development') ? 'inline-source-map' : false,
   devServer: {
     contentBase: './dist',
     host: '0.0.0.0',
