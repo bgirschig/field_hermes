@@ -1,7 +1,7 @@
 import GameObject from '@/js/gameEngine/GameObject';
 
-const FULL_ROTATE_SPEED = -0.01;
-const FULL_FLY_SPEED = -0.008;
+const FULL_ROTATE_SPEED = -0.001;
+const FULL_FLY_SPEED = -0.013;
 
 export default class CameraHandler extends GameObject {
   constructor(camera) {
@@ -17,18 +17,19 @@ export default class CameraHandler extends GameObject {
     this.flySpeed = 0;
   }
 
-  update() {
-    if (this.rotating) this.rotateSpeed += (FULL_ROTATE_SPEED - this.rotateSpeed) * 0.02;
-    else this.rotateSpeed -= this.rotateSpeed * 0.02;
-
-    if (this.flying) this.flySpeed += (FULL_FLY_SPEED - this.flySpeed) * 0.02;
-    else this.flySpeed * 0.02;
+  update({frame}) {
+    if (this.game.keyboardState['f']) {
+      // fly mode
+      this.rotateSpeed -= this.rotateSpeed * 0.01;
+      this.flySpeed += (FULL_FLY_SPEED - this.flySpeed) * 0.005;
+      if (frame%30===0) console.log(this.flySpeed);
+    } else {
+      // rotate mode
+      this.rotateSpeed += (FULL_ROTATE_SPEED - this.rotateSpeed) * 0.02;
+      this.flySpeed * 0.02;
+    }
 
     this.rotateX(this.rotateSpeed);
     this.translateZ(this.flySpeed);
-
-    const rotating = Math.abs(this.rotateSpeed) > 0.000005;
-    const flying = Math.abs(this.flySpeed) > 0.000005;
-    this.needsRender = rotating || flying;
   }
 }
