@@ -17,8 +17,8 @@ export default class CameraHandler extends GameObject {
     this.flySpeed = 0;
   }
 
-  update({frame}) {
-    if (this.game.keyboardState['f']) {
+  update({frame, keyboard}) {
+    if (keyboard['f']) {
       // fly mode
       this.rotateSpeed -= this.rotateSpeed * 0.01;
       this.flySpeed += (FULL_FLY_SPEED - this.flySpeed) * 0.005;

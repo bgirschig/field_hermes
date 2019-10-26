@@ -56,7 +56,7 @@ export default class GameEngine {
       time: now,
       deltaTime,
       frameRate,
-      keyboardState,
+      keyboard: this.keyboardState,
     }]});
     this.renderer.render( this.scene, this.camera );
     this.frame += 1;
