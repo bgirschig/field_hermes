@@ -1,4 +1,5 @@
 import {Group} from 'three';
+import GameEngine from './GameEngine';
 
 /**  */
 export default class GameObject extends Group {
@@ -6,20 +7,26 @@ export default class GameObject extends Group {
   constructor() {
     super();
     this.active = true;
-    this.needsRender = true;
+
+    /** @type {GameEngine} */
+    this.game = null;
   }
 
-  get needsRender() {
-    if (this._needsRender) return true;
-    return this.children.some(child => child.needsRender);
+  /**
+   * What to do on update. To be implemented by extending class
+   * @override
+   * @param {Object} info
+   * @param {Number} info.frame - current frame index
+   * @param {Number} info.time - current time (high precision milliseconds)
+   * @param {Number} info.deltaTime - time between last update and current one
+   * @param {Number} info.frameRate -  current framerate
+   */
+  update(info) {
   }
 
-  set needsRender(value) {
-    this._needsRender = value;
-    this.children.forEach(child => child.needsRender = false);
+  onKeyDown() {
   }
 
-  /** What to do on update. To be implemented by extending class */
-  update() {
+  onKeyUp() {
   }
 }

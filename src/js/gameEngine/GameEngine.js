@@ -20,16 +20,45 @@ export default class GameEngine {
     this.frame = 0;
     this.children = [];
 
-    document.body.appendChild( this.renderer.domElement );
+    this.keyboardState = {};
+    window.addEventListener('keydown', this.onKeyDown.bind(this));
+    window.addEventListener('keyup', this.onKeyUp.bind(this));
+
+    this.dom = this.renderer.domElement;
+    document.body.appendChild( this.dom );
+
+    this.prevTime = performance.now();
     this.loop();
+  }
+
+  onKeyDown(e) {
+    if (this.keyboardState[e.key]) return;
+    this.keyboardState[e.key] = true;
+    this.applyTochildren({methodName: 'onKeyDown', args: [e]});
+  }
+
+  onKeyUp(e) {
+    if (!this.keyboardState[e.key]) return;
+    this.keyboardState[e.key] = false;
+    this.applyTochildren({methodName: 'onKeyUp', args: [e]});
   }
 
   /** gameEngine's main loop function */
   loop() {
     requestAnimationFrame(this.loop.bind(this));
 
-    this.update();
-    this.render();
+    const now = performance.now();
+    const deltaTime = now - this.prevTime;
+    this.prevTime = now;
+    const frameRate = 1000/deltaTime;
+    this.applyTochildren({methodName: 'update', args: [{
+      frame: this.frame,
+      time: now,
+      deltaTime,
+      frameRate,
+      keyboardState,
+    }]});
+    this.renderer.render( this.scene, this.camera );
     this.frame += 1;
   }
 
@@ -42,20 +71,12 @@ export default class GameEngine {
     return this.renderer.domElement.height;
   }
 
-  /** update all gameObjects */
-  update() {
-    for (let index = 0; index < this.children.length; index++) {
-      const child = this.children[index];
-      if (child.active) child.update();
-    }
-  }
-
-  /** Render the scene */
-  render() {
-    const needsRender = this.children.some(child => child.active && child.needsRender);
-    if (!needsRender) return;
-    this.renderer.render( this.scene, this.camera );
-    this.children.forEach(child => child.needsRender = false);
+  applyTochildren({methodName=null, method=null, args=[], skipDisabled=true} = {}) {
+    this.children.forEach(child => {
+      if (skipDisabled && !child.active) return;
+      if (methodName) child[methodName](...args);
+      else if (method) method(child, ...args);
+    });
   }
 
   /**
@@ -64,7 +85,7 @@ export default class GameEngine {
    */
   add(child) {
     this.scene.add(child);
-    child.scene = this;
+    child.game = this;
     this.children.push(child);
   }
 
@@ -74,7 +95,7 @@ export default class GameEngine {
    */
   remove(child) {
     this.scene.remove(child);
-    child.scene = null;
+    child.game = null;
     const idx = this.children.indexOf(child);
     this.children.splice(idx, 1);
   }
