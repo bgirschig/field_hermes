@@ -4,10 +4,14 @@ const FULL_ROTATE_SPEED = -0.01;
 const FULL_FLY_SPEED = -0.008;
 
 export default class CameraHandler extends GameObject {
-  constructor() {
+  constructor(camera) {
     super();
     this.rotating = false;
     this.flying = true;
+
+    this.add(camera);
+    camera.position.y = 1.1;
+    camera.rotateX(-0.09);
 
     this.rotateSpeed = FULL_ROTATE_SPEED;
     this.flySpeed = 0;
