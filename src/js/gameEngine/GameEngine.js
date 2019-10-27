@@ -34,13 +34,13 @@ export default class GameEngine {
   onKeyDown(e) {
     if (this.keyboardState[e.key]) return;
     this.keyboardState[e.key] = true;
-    this.applyTochildren({methodName: 'onKeyDown', args: [e]});
+    this.applyTochildren({methodName: 'onKeyDown', args: [e], skipInvisible: false});
   }
 
   onKeyUp(e) {
     if (!this.keyboardState[e.key]) return;
     this.keyboardState[e.key] = false;
-    this.applyTochildren({methodName: 'onKeyUp', args: [e]});
+    this.applyTochildren({methodName: 'onKeyUp', args: [e], skipInvisible: false});
   }
 
   /** gameEngine's main loop function */
@@ -57,6 +57,7 @@ export default class GameEngine {
       deltaTime,
       frameRate,
       keyboard: this.keyboardState,
+      skipInvisible: false,
     }]});
     this.renderer.render( this.scene, this.camera );
     this.frame += 1;
@@ -71,9 +72,11 @@ export default class GameEngine {
     return this.renderer.domElement.height;
   }
 
-  applyTochildren({methodName=null, method=null, args=[], skipDisabled=true} = {}) {
+  applyTochildren({methodName=null, method=null, args=[], skipDisabled=true,
+    skipInvisible=true} = {}) {
     this.children.forEach(child => {
       if (skipDisabled && !child.active) return;
+      if (skipInvisible && !child.visible) return;
       if (methodName) child[methodName](...args);
       else if (method) method(child, ...args);
     });

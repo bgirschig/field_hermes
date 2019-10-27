@@ -21,4 +21,8 @@ export default class Planet extends GameObject {
     this.mesh = new THREE.Mesh( geometry, material );
     this.add(this.mesh);
   }
+
+  onKeyUp(e) {
+    if (e.key === 'p') this.visible = !this.visible;
+  }
 }

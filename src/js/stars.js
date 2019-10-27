@@ -53,4 +53,8 @@ export default class Stars extends GameObject {
       this.add(stars);
     });
   }
+
+  onKeyUp(e) {
+    if (e.key === 's') this.visible = !this.visible;
+  }
 }
