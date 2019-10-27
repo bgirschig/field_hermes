@@ -15,7 +15,7 @@ function main() {
 
   game.add( new CameraHandler(game.camera) );
   game.add( new Planet() );
-  game.add( new Stars(8000, theme.foreground, 100) );
+  game.add( new Stars(6000, theme.foreground, 100) );
 }
 
 main();

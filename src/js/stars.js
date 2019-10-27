@@ -28,8 +28,8 @@ export default class Stars extends GameObject {
 
     textures.forEach(textureItem => {
       // Create vertices
-      const vertices = new Float32Array(count * pointDimensions);
       const valueCount = countPerTexture * pointDimensions;
+      const vertices = new Float32Array(valueCount);
       for ( let i = 0; i < valueCount; i += 3 ) {
         vertices[i + 0] = THREE.Math.randFloatSpread( spread );
         vertices[i + 1] = THREE.Math.randFloatSpread( spread );
