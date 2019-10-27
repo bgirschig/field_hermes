@@ -6,6 +6,7 @@ import GameEngine from '@/js/gameEngine/GameEngine';
 import Planet from '@/js/gameObjects/planet';
 import CameraHandler from '@/js/gameObjects/cameraHandler';
 import Stars from '@/js/gameObjects/stars';
+import Swing from '@/js/gameObjects/Swing';
 
 /** Main app method. everything starts from here */
 function main() {
@@ -13,7 +14,10 @@ function main() {
     background: theme.background,
   });
 
-  game.add( new CameraHandler(game.camera) );
+  const swing = new Swing();
+
+  game.add( swing );
+  game.add( new CameraHandler(game.camera, swing) );
   game.add( new Planet() );
   game.add( new Stars(6000, theme.foreground, 100) );
 }
