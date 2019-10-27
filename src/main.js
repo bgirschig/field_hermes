@@ -3,9 +3,9 @@ import '@/style/layout.css';
 import * as theme from '@/style/theme';
 import GameEngine from '@/js/gameEngine/GameEngine';
 
-import Planet from '@/js/planet';
-import CameraHandler from '@/js/cameraHandler';
-import Stars from '@/js/stars';
+import Planet from '@/js/gameObjects/planet';
+import CameraHandler from '@/js/gameObjects/cameraHandler';
+import Stars from '@/js/gameObjects/stars';
 
 /** Main app method. everything starts from here */
 function main() {
