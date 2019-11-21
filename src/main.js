@@ -15,10 +15,11 @@ function main() {
   });
 
   const swing = new Swing();
+  const planet = new Planet();
 
   game.add( swing );
-  game.add( new CameraHandler(game.camera, swing) );
-  game.add( new Planet() );
+  game.add( new CameraHandler(game.camera, swing, planet) );
+  game.add( planet );
   game.add( new Stars(6000, theme.foreground, 100) );
 }
 
