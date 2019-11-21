@@ -2,8 +2,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const env = process.env.NODE_ENV || 'development';
 
+
 module.exports = {
-  entry: './src/main.js',
+  entry: {
+    experiment: './src/js/main-experiment.js',
+    mask: './src/js/main-mask.js',
+  },
   mode: env,
   resolve: {
     alias: {
@@ -32,11 +36,20 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      hash: true,
       template: './src/index.html',
+      filename: 'index.html',
+      chunks: ['experiment'],
+    }),
+    new HtmlWebpackPlugin({
+      hash: true,
+      template: './src/mask.html',
+      filename: 'mask.html',
+      chunks: ['mask'],
     }),
   ],
   output: {
-    filename: 'main.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   target: 'web',
