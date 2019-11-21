@@ -1,45 +1,72 @@
 import GameObject from '@/js/gameEngine/GameObject';
 import {Group} from 'three';
+import {TweenLite, Power2} from 'gsap/TweenMax';
 
-const FULL_ROTATE_SPEED = -0.001;
+const FULL_ROTATE_SPEED = -0.002;
 const FULL_FLY_SPEED = -0.013;
 const SWING_LENGTH = 0.5;
 
 export default class CameraHandler extends GameObject {
-  constructor(camera, swing) {
+  /**
+   * @param {THREE.Camera} camera
+   * @param {GameObject} swing
+   * @param {GameObject} planet
+   */
+  constructor(camera, swing, planet) {
     super();
     this.rotating = false;
-    this.flying = true;
+    this.flying = false;
     this.swing = swing;
 
     this.swingGroup = new Group();
     this.swingGroup.position.y = 1.1 + SWING_LENGTH;
     this.add(this.swingGroup);
 
+    this.camera = camera;
+    this.planet = planet;
+
     camera.rotateX(-0.09);
     camera.position.y = -SWING_LENGTH;
     this.swingGroup.add(camera);
 
+    /** @type {import('gsap').Tween} */
+    this.tweener = null;
+
     this.rotateSpeed = FULL_ROTATE_SPEED;
     this.flySpeed = 0;
     this.swingInfluence = 0;
+
   }
 
-  update({keyboard}) {
-    if (keyboard['f']) {
-      // fly mode
-      this.rotateSpeed += (0 - this.rotateSpeed) * 0.02;
-      this.flySpeed += (FULL_FLY_SPEED - this.flySpeed) * 0.01;
-      this.swingInfluence += (1 - this.swingInfluence) * 0.01;
-    } else {
-      // rotate mode
-      this.rotateSpeed += (FULL_ROTATE_SPEED - this.rotateSpeed) * 0.02;
-      this.flySpeed += (0 - this.flySpeed) * 0.02;
-      this.swingInfluence += (0 - this.swingInfluence) * 0.02;
-    }
-
-    this.swingGroup.rotation.x += this.swing.value * 0.003 * this.swingInfluence;
+  update() {
+    this.swingGroup.position.z = this.swing.value * 1.5 * this.swingInfluence;
     this.rotateX(this.rotateSpeed);
     this.translateZ(this.flySpeed);
+  }
+
+  onKeyUp(e) {
+    if (e.key === 'f') {
+      if (this.tweener) this.tweener.kill();
+      if (this.flying) {
+        this.flying = false;
+        this.tweener = TweenLite.to(this, 3, {
+          rotateSpeed: FULL_ROTATE_SPEED,
+          flySpeed: 0,
+          swingInfluence: 0,
+          ease: Power2.easeInOut,
+          onComplete: () => {
+            this.getWorldPosition(this.planet.position);
+          },
+        });
+      } else {
+        this.flying = true;
+        this.tweener = TweenLite.to(this, 3, {
+          rotateSpeed: 0,
+          flySpeed: FULL_FLY_SPEED,
+          swingInfluence: 1,
+          ease: Power2.easeInOut,
+        });
+      }
+    }
   }
 }
