@@ -56,6 +56,5 @@ module.exports = {
   devtool: (env === 'development') ? 'inline-source-map' : false,
   devServer: {
     contentBase: './dist',
-    host: '0.0.0.0',
   },
 };

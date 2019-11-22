@@ -1,19 +1,20 @@
-import { type } from "os";
+/**
+ * @param {Object} config
+ * @param {HTMLVideoElement} config.video - (optionnal) Video element to send the camera contents to
+ */
+export async function init({video} = {}) {
+  if (!video) video = document.createElement('video');
+  else if (typeof video === 'string') video = document.querySelector(video);
 
-export function init(video) {
-  const videoElement = document.createElement('video');
-  console.log(type(videoElement));
-  return;
-  var video = document.querySelector("#videoElement");
+  if (!navigator.mediaDevices.getUserMedia) throw new Error('camera not available');
 
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function (stream) {
-        video.srcObject = stream;
-      })
-      .catch(function (err0r) {
-        console.log("Something went wrong!");
-      });
-  }
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+  video.play();
 
+  await new Promise(resolve => {
+    video.addEventListener('loadedmetadata', resolve);
+  });
+
+  return {video, stream};
 }
