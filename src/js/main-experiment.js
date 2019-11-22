@@ -13,6 +13,7 @@ function main() {
   const game = new GameEngine({
     background: theme.background,
   });
+  // game.paused = true;
 
   const swing = new Swing();
   const planet = new Planet();

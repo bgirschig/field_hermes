@@ -35,38 +35,45 @@ export default class CameraHandler extends GameObject {
     this.rotateSpeed = FULL_ROTATE_SPEED;
     this.flySpeed = 0;
     this.swingInfluence = 0;
-
   }
 
-  update() {
-    this.swingGroup.position.z = this.swing.value * 1.5 * this.swingInfluence;
+  update({deltaTime}) {
+    if (this.swingInfluence > 0) {
+      if (this.swing.smoothSpeed > 0) this.translateZ(this.swing.smoothSpeed * 10);
+      else this.translateZ(this.swing.smoothSpeed * 80);
+    }
+
+    // this.swingGroup.position.z = this.swing.value * 4 * this.swingInfluence;
     this.rotateX(this.rotateSpeed);
-    this.translateZ(this.flySpeed);
+    // this.translateZ(this.flySpeed);
   }
 
   onKeyUp(e) {
-    if (e.key === 'f') {
-      if (this.tweener) this.tweener.kill();
-      if (this.flying) {
-        this.flying = false;
-        this.tweener = TweenLite.to(this, 3, {
-          rotateSpeed: FULL_ROTATE_SPEED,
-          flySpeed: 0,
-          swingInfluence: 0,
-          ease: Power2.easeInOut,
-          onComplete: () => {
-            this.getWorldPosition(this.planet.position);
-          },
-        });
-      } else {
-        this.flying = true;
-        this.tweener = TweenLite.to(this, 3, {
-          rotateSpeed: 0,
-          flySpeed: FULL_FLY_SPEED,
-          swingInfluence: 1,
-          ease: Power2.easeInOut,
-        });
-      }
+    if (e.key === 'f') this.toggleFlyMode();
+    if (e.code === 'Space') this.game.paused = !this.game.paused;
+  }
+
+  toggleFlyMode() {
+    if (this.tweener) this.tweener.kill();
+    if (this.flying) {
+      this.flying = false;
+      this.tweener = TweenLite.to(this, 3, {
+        rotateSpeed: FULL_ROTATE_SPEED,
+        flySpeed: 0,
+        swingInfluence: 0,
+        ease: Power2.easeInOut,
+        onComplete: () => {
+          this.getWorldPosition(this.planet.position);
+        },
+      });
+    } else {
+      this.flying = true;
+      this.tweener = TweenLite.to(this, 3, {
+        rotateSpeed: 0,
+        flySpeed: FULL_FLY_SPEED,
+        swingInfluence: 1,
+        ease: Power2.easeInOut,
+      });
     }
   }
 }
