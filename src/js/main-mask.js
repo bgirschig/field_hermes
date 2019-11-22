@@ -14,11 +14,18 @@ let mainCtx;
 /** @type {HTMLDivElement} */
 let cursor;
 
-// state
-let mouseDown = false;
-
 // config
-const brushRadius = 30;
+let brushRadius = 30;
+
+// state
+let drawing = false;
+let scalingBrush = false;
+let canvasBounds = null;
+let isAdding = false;
+let maskOnly = false;
+let mouseDownPos = null;
+let prevBrushRadius = brushRadius;
+
 
 async function init() {
   mainCanvas = document.querySelector('canvas');
@@ -32,40 +39,91 @@ async function init() {
   mainCanvas.width = video.videoWidth;
   mainCanvas.height = video.videoHeight;
   mainCtx = mainCanvas.getContext('2d');
-  mainCtx.globalCompositeOperation = 'multiply';
   // initialize mask canvas
   maskCanvas.width = video.videoWidth;
   maskCanvas.height = video.videoHeight;
   maskCtx = maskCanvas.getContext('2d');
-  maskCtx.fillStyle = '#444444';
+  maskCtx.fillStyle = 'white';
   maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+  // various
+  canvasBounds = mainCanvas.getBoundingClientRect();
 
   // initialize event
-  window.addEventListener('mousedown', () => mouseDown = true);
-  window.addEventListener('mouseup', () => mouseDown = false);
+  window.addEventListener('mousedown', onMouseDown);
+  window.addEventListener('mouseup', onMouseUp);
   window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('keyup', onKey);
 
   // start
   loop();
 }
 
+function onMouseDown(e) {
+  mouseDownPos = screenToCanvas(e.clientX, e.clientY);
+  if (e.altKey) {
+    scalingBrush = true;
+    prevBrushRadius = brushRadius;
+  } else {
+    drawing = true;
+    onMouseMove(e);
+  }
+}
+
+function onMouseUp(e) {
+  drawing = false;
+  scalingBrush = false;
+}
+
 function onMouseMove(e) {
-  if (mouseDown) {
+  const position = screenToCanvas(e.clientX, e.clientY);
+  if (drawing) {
     maskCtx.beginPath();
-    maskCtx.ellipse(e.clientX, e.clientY, brushRadius, brushRadius, 0, 0, Math.PI*2);
-    maskCtx.fillStyle = 'white';
+    maskCtx.ellipse(position.x, position.y, brushRadius, brushRadius, 0, 0, Math.PI*2);
+    maskCtx.fillStyle = isAdding ? 'white' : 'black';
     maskCtx.fill();
   }
 
-  cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+  if (scalingBrush) {
+    const dist = Math.sqrt((position.x - mouseDownPos.x) ** 2 + (position.y - mouseDownPos.y) ** 2);
+    brushRadius = dist;
+    cursor.style.width = `${brushRadius*2}px`;
+    cursor.style.height = `${brushRadius*2}px`;
+    cursor.style.transform = `
+      translate(${mouseDownPos.screenX}px, ${mouseDownPos.screenY}px)
+      translate(-50%, -50%)`;
+  } else {
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+  }
+}
+
+function onKey(e) {
+  if (e.key === 'x') isAdding = !isAdding;
+  if (e.key === 'm') maskOnly = !maskOnly;
 }
 
 function loop() {
   requestAnimationFrame(loop);
 
   mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-  mainCtx.drawImage(video, 0, 0);
+  if (maskOnly) {
+    mainCtx.globalAlpha = 1;
+    mainCtx.globalCompositeOperation = 'source-over';
+  } else {
+    mainCtx.globalAlpha = 1;
+    mainCtx.drawImage(video, 0, 0);
+    mainCtx.globalCompositeOperation = 'multiply';
+    mainCtx.globalAlpha = 0.6;
+  }
   mainCtx.drawImage(maskCanvas, 0, 0);
+}
+
+function screenToCanvas(x, y) {
+  return {
+    x: x - canvasBounds.x,
+    y: y - canvasBounds.y,
+    screenX: x,
+    screenY: y,
+  };
 }
 
 init();
