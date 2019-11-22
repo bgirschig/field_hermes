@@ -37,10 +37,15 @@ export default class CameraHandler extends GameObject {
     this.swingInfluence = 0;
   }
 
-  update() {
-    this.swingGroup.position.z = this.swing.value * 1.5 * this.swingInfluence;
+  update({deltaTime}) {
+    if (this.swingInfluence > 0) {
+      if (this.swing.smoothSpeed > 0) this.translateZ(this.swing.smoothSpeed * 10);
+      else this.translateZ(this.swing.smoothSpeed * 80);
+    }
+
+    // this.swingGroup.position.z = this.swing.value * 4 * this.swingInfluence;
     this.rotateX(this.rotateSpeed);
-    this.translateZ(this.flySpeed);
+    // this.translateZ(this.flySpeed);
   }
 
   onKeyUp(e) {
