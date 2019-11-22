@@ -28,7 +28,7 @@ export default class GameEngine {
     document.body.appendChild( this.dom );
 
     this.prevTime = performance.now();
-    this.loop();
+    this.paused = false;
   }
 
   onKeyDown(e) {
@@ -45,7 +45,7 @@ export default class GameEngine {
 
   /** gameEngine's main loop function */
   loop() {
-    requestAnimationFrame(this.loop.bind(this));
+    this.loopRequest = requestAnimationFrame(this.loop.bind(this));
 
     const now = performance.now();
     const deltaTime = now - this.prevTime;
@@ -61,6 +61,21 @@ export default class GameEngine {
     }]});
     this.renderer.render( this.scene, this.camera );
     this.frame += 1;
+  }
+
+  get paused() {
+    return this._paused;
+  }
+  set paused(value) {
+    if (value === this.paused) return;
+    this._paused = value;
+
+    if (!this.paused && !this.loopRequest) {
+      this.loopRequest = requestAnimationFrame(this.loop.bind(this));
+    } else {
+      cancelAnimationFrame(this.loopRequest);
+      this.loopRequest = null;
+    }
   }
 
   /** Scene width */

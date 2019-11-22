@@ -35,7 +35,6 @@ export default class CameraHandler extends GameObject {
     this.rotateSpeed = FULL_ROTATE_SPEED;
     this.flySpeed = 0;
     this.swingInfluence = 0;
-
   }
 
   update() {
@@ -45,28 +44,31 @@ export default class CameraHandler extends GameObject {
   }
 
   onKeyUp(e) {
-    if (e.key === 'f') {
-      if (this.tweener) this.tweener.kill();
-      if (this.flying) {
-        this.flying = false;
-        this.tweener = TweenLite.to(this, 3, {
-          rotateSpeed: FULL_ROTATE_SPEED,
-          flySpeed: 0,
-          swingInfluence: 0,
-          ease: Power2.easeInOut,
-          onComplete: () => {
-            this.getWorldPosition(this.planet.position);
-          },
-        });
-      } else {
-        this.flying = true;
-        this.tweener = TweenLite.to(this, 3, {
-          rotateSpeed: 0,
-          flySpeed: FULL_FLY_SPEED,
-          swingInfluence: 1,
-          ease: Power2.easeInOut,
-        });
-      }
+    if (e.key === 'f') this.toggleFlyMode();
+    if (e.code === 'Space') this.game.paused = !this.game.paused;
+  }
+
+  toggleFlyMode() {
+    if (this.tweener) this.tweener.kill();
+    if (this.flying) {
+      this.flying = false;
+      this.tweener = TweenLite.to(this, 3, {
+        rotateSpeed: FULL_ROTATE_SPEED,
+        flySpeed: 0,
+        swingInfluence: 0,
+        ease: Power2.easeInOut,
+        onComplete: () => {
+          this.getWorldPosition(this.planet.position);
+        },
+      });
+    } else {
+      this.flying = true;
+      this.tweener = TweenLite.to(this, 3, {
+        rotateSpeed: 0,
+        flySpeed: FULL_FLY_SPEED,
+        swingInfluence: 1,
+        ease: Power2.easeInOut,
+      });
     }
   }
 }
