@@ -16,7 +16,7 @@ class Detector:
   def __del__(self):
     print("closing capture", flush=True)
     if (self.cap): self.cap.release()
-  
+
   def setCamera(self, camera_id):
     """ select which camera to use """
     print('setCamera', camera_id, flush=True)
@@ -113,5 +113,6 @@ class Detector:
       for peak in peaks:
         cv2.line(display, (peak, 0), (peak, 100), (0,0,255), 3)
       retval, buffer = cv2.imencode('.jpg', display)
-      outputImg = base64.b64encode(buffer)
+      outputImg = base64.b64encode(buffer).decode()
+      outputImg = 'data:image/jpeg;base64,{}'.format(outputImg)
     return outputPeak, outputImg
