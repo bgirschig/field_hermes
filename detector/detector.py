@@ -3,6 +3,7 @@ import cv2
 from scipy.signal import find_peaks
 import base64
 import math
+import urllib.request
 
 class Detector:
   def __init__(self):
@@ -12,6 +13,7 @@ class Detector:
     self.maxY = None
     self.cap = None
     self.cropParams = [0, 1, 0.1, 0.5]
+    self._loadMask()
 
   def __del__(self):
     print("closing capture", flush=True)
@@ -37,6 +39,26 @@ class Detector:
 
     # setup default crop values
     self._updateCrop()
+
+  def setMask(self, dataUrl):
+    """ sets and saves a mask image: white pixels will be taken into
+    consideration black pixels will not """
+    response = urllib.request.urlopen(dataUrl)
+    with open('mask.png', 'wb') as f:
+      f.write(response.file.read())
+    self._loadMask()
+  
+  def getMask(self):
+    """ returns the currently saved mask """
+    if self.mask is None: return None
+    else:
+      retval, buffer = cv2.imencode('.png', self.mask)
+      b64buffer = base64.b64encode(buffer).decode()
+      return 'data:image/png;base64,{}'.format(b64buffer)
+
+  def _loadMask(self):
+    """ loads the currently saved mask """
+    self.mask = cv2.imread('mask.png')  
 
   def setCrop(self, minX, maxX, height, y):
     """ update the crop region: which part of the image to look at for processing """

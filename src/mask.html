@@ -20,12 +20,29 @@
       height: 60px;
       border: 1px solid white;
       border-radius: 100%;
+    .controls {
       position: absolute;
+      bottom: 0;
+      padding: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    button {
+      border: none;
+      font-size: 1rem;
+      text-transform: uppercase;
+      background-color: rgb(92, 113, 233);
+      color: white;
+      padding: 10px;
     }
   </style>
 </head>
 <body>
   <canvas></canvas>
   <div class="cursor"></div>
+  <div class="controls">
+    <button data-action="save">save</button>
+  </div>
 </body>
 </html>

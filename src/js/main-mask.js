@@ -1,4 +1,5 @@
 import * as camera from '@/js/utils/camera';
+import SocketStubClient from '@/js/utils/socketStubClient';
 
 // references
 /** @type {HTMLVideoElement} */
@@ -13,6 +14,8 @@ let maskCtx;
 let mainCtx;
 /** @type {HTMLDivElement} */
 let cursor;
+/** @type {SocketStubClient} */
+let detectorStub;
 
 // config
 let brushRadius = 30;
@@ -24,13 +27,14 @@ let canvasBounds = null;
 let isAdding = false;
 let maskOnly = false;
 let mouseDownPos = null;
-let prevBrushRadius = brushRadius;
-
 
 async function init() {
   mainCanvas = document.querySelector('canvas');
   maskCanvas = document.createElement('canvas');
   cursor = document.querySelector('.cursor');
+
+  detectorStub = new SocketStubClient('ws://localhost:8765');
+  await detectorStub.readyPromise;
 
   // initialize camera
   const cameraInfo = await camera.init();
@@ -43,8 +47,11 @@ async function init() {
   maskCanvas.width = video.videoWidth;
   maskCanvas.height = video.videoHeight;
   maskCtx = maskCanvas.getContext('2d');
-  maskCtx.fillStyle = 'white';
-  maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+  loadSaved();
+  // initialize controls
+  document.querySelectorAll('.controls button').forEach(control => {
+    control.addEventListener('click', () => onControl(control.dataset.action));
+  });
   // various
   canvasBounds = mainCanvas.getBoundingClientRect();
 
@@ -58,11 +65,24 @@ async function init() {
   loop();
 }
 
+async function loadSaved() {
+  const dataURI = await detectorStub.call('getMask');
+  if (dataURI) {
+    const img = new Image;
+    img.onload = () => {
+      maskCtx.drawImage(img, 0, 0);
+    };
+    img.src = dataURI;
+  } else {
+    maskCtx.fillStyle = 'white';
+    maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }
+}
+
 function onMouseDown(e) {
   mouseDownPos = screenToCanvas(e.clientX, e.clientY);
   if (e.altKey) {
     scalingBrush = true;
-    prevBrushRadius = brushRadius;
   } else {
     drawing = true;
     onMouseMove(e);
@@ -99,6 +119,18 @@ function onMouseMove(e) {
 function onKey(e) {
   if (e.key === 'x') isAdding = !isAdding;
   if (e.key === 'm') maskOnly = !maskOnly;
+}
+
+function onControl(action) {
+  switch (action) {
+    case 'save':
+      const dataURL = maskCanvas.toDataURL('image/png');
+      detectorStub.call('setMask', dataURL);
+      break;
+    default:
+      console.log('action not implemented:', action);
+      break;
+  }
 }
 
 function loop() {
